@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+
+  # caddy
+  proxy:
+    build:
+      context: ./proxy
+      args:
+        - caddy_revision=a7aeb979be5a59ae82fac0783fe54b83c7fc57fd
+        - _caddy_revision=4f5df39bdd9ce05146da14bb60f5a17a163d5262
+
+    environment:
+      DOMAIN: asdas.net
+
+    ports:
+      - "80:8080"
+      - "443:8443"
+    entrypoint: ["caddy", "-agree", "-http-port", "8080", "-https-port", "8443", "-conf", "/config/Caddyfile", "-log", "stdout"]

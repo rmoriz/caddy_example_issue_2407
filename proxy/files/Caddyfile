@@ -1,0 +1,16 @@
+http://{$DOMAIN}:8080 {
+  redir https://{$DOMAIN}{uri}
+}
+
+https://{$DOMAIN}:8443 {
+  tls postmaster@{$DOMAIN}
+  limits 1mb
+  log stdout
+  errors stdout
+
+  proxy / webhook:4567 {
+    transparent
+    header_downstream -Server
+    header_upstream -Server
+  }
+}
