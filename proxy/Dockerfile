@@ -3,12 +3,11 @@ FROM golang:1.11-alpine3.8
 ARG caddy_revision
 RUN apk add --no-cache git tar curl \
      && mkdir -p /go/src/github.com/mholt \
-     && cd /go/src/github.com/mholt && git clone https://github.com/mholt/caddy \
-     && cd caddy && git checkout $caddy_revision -b deployment \
+     && cd /go/src/github.com/mholt && git clone https://github.com/mholt/caddy
+
+RUN cd /go/src/github.com/mholt/caddy && git checkout ${caddy_revision} -b deployment \
      && go get -u -d github.com/caddyserver/builds
 
-WORKDIR /go/src/github.com/mholt/caddy
-COPY files/ .
 
 WORKDIR /go/src/github.com/mholt/caddy/caddy
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o caddy  && ./caddy -version
@@ -18,6 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o caddy  && ./caddy
 #
 FROM alpine:3.8
 
+ARG caddy_revision
 COPY --from=0 /go/src/github.com/mholt/caddy/caddy/caddy /usr/bin/caddy
 
 RUN apk add --no-cache ca-certificates curl \
@@ -40,4 +40,4 @@ WORKDIR /config
 
 ENTRYPOINT ["/usr/bin/caddy"]
 
-CMD ["-agree", "-http-port", "8080", "-https-port", "8443", "-conf", "/config/Caddyfile", "-log", "stdout"]
+CMD ["-ca", "https://acme-staging-v02.api.letsencrypt.org/directory", "-agree", "-http-port", "8080", "-https-port", "8443", "-conf", "/config/Caddyfile", "-log", "stdout"]
