@@ -8,6 +8,10 @@ RUN apk add --no-cache git tar curl \
 RUN cd /go/src/github.com/mholt/caddy && git checkout ${caddy_revision} -b deployment \
      && go get -u -d github.com/caddyserver/builds
 
+WORKDIR /go/src/github.com/mholt/caddy
+
+RUN wget https://github.com/oscartbeaumont/caddy/commit/248259b5b0808a827dd32bd102f6723791c3199b.patch -O oscartbeaumont.patch\
+  && patch -p1 < oscartbeaumont.patch
 
 WORKDIR /go/src/github.com/mholt/caddy/caddy
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o caddy  && ./caddy -version
