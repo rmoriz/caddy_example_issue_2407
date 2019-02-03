@@ -7,7 +7,7 @@ services:
     build:
       context: ./proxy
       args:
-        - caddy_revision=${caddy_revision}
+        - caddy_revision=master
 
     environment:
       DOMAIN: asdas.net
